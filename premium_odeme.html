@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Ödeme — AI Akademi{% endblock %}
+{% block content %}
+<div class="card form-card" style="max-width:480px;">
+  <h2>Ödeme bilgileri</h2>
+  <p style="color:var(--ink-dim); font-size:0.88rem; text-align:center; margin-top:-1rem;">
+    Bu bilgiler iyzico'nun güvenli ödeme sayfasına yönlendirmek için
+    gerekiyor. Kart bilgilerini biz görmeyiz, doğrudan iyzico'nun
+    sayfasında girersin.
+  </p>
+  <form method="POST">
+    <div class="field">
+      <label for="name">Ad</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+    <div class="field">
+      <label for="surname">Soyad</label>
+      <input type="text" id="surname" name="surname" required>
+    </div>
+    <div class="field">
+      <label for="identity_number">T.C. Kimlik No</label>
+      <input type="text" id="identity_number" name="identity_number" required pattern="[0-9]{11}" maxlength="11" title="11 haneli T.C. kimlik numarası">
+    </div>
+    <div class="field">
+      <label for="gsm">Telefon (opsiyonel)</label>
+      <input type="text" id="gsm" name="gsm" placeholder="+905XXXXXXXXX">
+    </div>
+    <div class="field">
+      <label for="address">Adres</label>
+      <input type="text" id="address" name="address" required>
+    </div>
+    <div class="field">
+      <label for="city">Şehir</label>
+      <input type="text" id="city" name="city" required>
+    </div>
+    <button type="submit" class="btn btn--amber">{{ price }} TL öde — iyzico'ya git</button>
+  </form>
+</div>
+{% endblock %}

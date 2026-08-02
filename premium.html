@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Premium — AI Akademi{% endblock %}
+{% block content %}
+<div class="panel" style="max-width:640px;">
+  {% if current_user.is_premium %}
+    <div class="card" style="text-align:center;">
+      <div class="hero__eyebrow">Zaten üyesin</div>
+      <h2>Premium hesabın aktif ✨</h2>
+      <p style="color:var(--ink-dim)">Tüm modüller senin için açık, istediğin sırayla ilerleyebilirsin.</p>
+      <a href="{{ url_for('dashboard') }}" class="btn btn--primary">Panele dön</a>
+    </div>
+  {% else %}
+    <div class="card">
+      <div class="hero__eyebrow">Sadece hızlı ilerlemek isteyenler için</div>
+      <h2>Premium'a geç, tüm modülleri anında aç</h2>
+      <p style="color:var(--ink-dim)">
+        Kursun normal akışında bir modülü açmak için bir önceki modülün
+        quiz'ini tamamlaman gerekir. Aceleci değilsen buna hiç gerek yok —
+        bu tamamen isteğe bağlı. Ama zamanın kısıtlıysa ve tüm derslere
+        sırayı beklemeden göz atmak istiyorsan, Premium tam sana göre.
+      </p>
+      <ul style="color:var(--ink-dim); line-height:2; padding-left:1.2rem;">
+        <li>Tüm modüllere anında, istediğin sırada erişim</li>
+        <li>Tek seferlik ödeme, abonelik yok</li>
+        <li>Chatbot pratiği ve quiz'ler zaten herkese açık, değişmiyor</li>
+      </ul>
+      <div style="display:flex; align-items:baseline; gap:0.5rem; margin:1.5rem 0;">
+        <span style="font-family:var(--serif); font-size:2.4rem;">{{ price }} TL</span>
+        <span style="color:var(--ink-dim)">/ tek seferlik</span>
+      </div>
+      {% if iyzico_ready %}
+        <a href="{{ url_for('premium_odeme') }}" class="btn btn--amber">Premium'a geç</a>
+      {% else %}
+        <button class="btn btn--amber" disabled>Ödeme sistemi şu an kapalı</button>
+        <p class="chat-note">Site yöneticisi iyzico anahtarlarını henüz tanımlamamış.</p>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
