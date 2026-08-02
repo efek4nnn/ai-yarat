@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ module.title }} — AI Akademi{% endblock %}
+{% block content %}
+<div class="lesson-head">
+  <div class="eyebrow">{{ module.years }}</div>
+  <h1>{{ module.title }}</h1>
+</div>
+
+<div class="lesson-body">
+  {% for para in module.body %}
+    <p>{{ para }}</p>
+  {% endfor %}
+</div>
+
+{% if module.turkiye_notu %}
+<div class="tr-callout">
+  <span class="tr-callout__tag">🇹🇷 Türkiye'den</span>
+  <p>{{ module.turkiye_notu }}</p>
+</div>
+{% endif %}
+
+<div class="quiz">
+  <h2>Kendini test et</h2>
+
+  {% if result %}
+    <div class="quiz-result">
+      <span>Sonucun: <strong>{{ result.correct }} / {{ result.total }}</strong> doğru</span>
+      {% if next_module %}
+        <a href="{{ url_for('module_view', slug=next_module.slug) }}" class="btn btn--primary">Sıradaki modül →</a>
+      {% else %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn--primary">Panele dön</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <form method="POST">
+    {% for q in module.quiz %}
+    {% set qi = loop.index0 %}
+    <div class="quiz-q">
+      <p class="q-text">{{ loop.index }}. {{ q.q }}</p>
+      {% for opt in q.options %}
+      <label class="quiz-opt">
+        <input type="radio" name="q{{ qi }}" value="{{ loop.index0 }}" required>
+        <span class="opt-label">{{ "ABCD"[loop.index0] }}</span> {{ opt }}
+      </label>
+      {% endfor %}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn--primary">Cevapları gönder</button>
+  </form>
+</div>
+{% endblock %}
