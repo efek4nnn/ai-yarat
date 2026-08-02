@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Sohbet — AI Akademi{% endblock %}
+{% block content %}
+<div class="chat-wrap">
+  <h2>Yapay zekâ öğretmenine soru sor</h2>
+  <p style="color:var(--ink-dim); margin-top:-0.6rem;">
+    Derslerde geçen kavramlardan aklına takılan bir şey mi var? Sıfırdan
+    başlayan biri gibi soru sorabilirsin — sade bir dille açıklar.
+  </p>
+
+  <div class="chat-window">
+    <div id="chat-messages" class="chat-messages">
+      {% if not api_ready %}
+        <div class="msg msg--system">
+          ⚠️ Sunucuda ANTHROPIC_API_KEY tanımlı değil. .env dosyasına kendi
+          API anahtarını ekleyip sunucuyu yeniden başlat.
+        </div>
+      {% else %}
+        <div class="msg msg--system">Sohbet hazır — bir soru yazarak başla.</div>
+      {% endif %}
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="Örn: Sinir ağında ağırlık ne demek?" {% if not api_ready %}disabled{% endif %}>
+      <button id="chat-send" {% if not api_ready %}disabled{% endif %}>Gönder</button>
+    </div>
+  </div>
+  <p class="chat-note">Cevaplar bir yapay zekâ modeli tarafından üretilir, her zaman doğrulama yap.</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const messagesEl = document.getElementById('chat-messages');
+const inputEl = document.getElementById('chat-input');
+const sendBtn = document.getElementById('chat-send');
+let history = [];
+
+function addMessage(role, text) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role === 'user' ? 'msg--user' : role === 'assistant' ? 'msg--bot' : 'msg--system');
+  div.textContent = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+async function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text) return;
+  addMessage('user', text);
+  history.push({ role: 'user', content: text });
+  inputEl.value = '';
+  sendBtn.disabled = true;
+
+  const thinkingDiv = document.createElement('div');
+  thinkingDiv.className = 'msg msg--system';
+  thinkingDiv.textContent = 'Yazıyor…';
+  messagesEl.appendChild(thinkingDiv);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  try {
+    const res = await fetch('/api/sohbet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, history: history.slice(0, -1) })
+    });
+    const data = await res.json();
+    thinkingDiv.remove();
+    if (res.ok) {
+      addMessage('assistant', data.reply);
+      history.push({ role: 'assistant', content: data.reply });
+    } else {
+      addMessage('system', data.error || 'Bir hata oluştu.');
+    }
+  } catch (err) {
+    thinkingDiv.remove();
+    addMessage('system', 'Bağlantı hatası: ' + err.message);
+  } finally {
+    sendBtn.disabled = false;
+    inputEl.focus();
+  }
+}
+
+sendBtn?.addEventListener('click', sendMessage);
+inputEl?.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+</script>
+{% endblock %}
